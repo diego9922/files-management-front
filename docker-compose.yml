@@ -1,0 +1,14 @@
+services:
+  fm-front:
+    container_name: "fm-front"
+    ports:
+      - ${PORT}:3000
+    volumes:
+      - ./:/home/node
+    build:
+      context: ./
+      dockerfile: Dockerfile 
+    tty: true
+    command: "npm run start"
+    env_file:
+      - .env
