@@ -1,0 +1,11 @@
+:root {
+    --first-color: #1B262C;
+    --second-color: #0F4C75;
+    --third-color: #3282B8;
+    --fourth-color: #BBE1FA;
+}
+
+.bg-dark {
+    background-color: var(--first-color);
+    color: white;
+}
