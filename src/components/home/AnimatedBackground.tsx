@@ -1,9 +1,10 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { Box, duration } from "@mui/material";
-import { blueGrey } from '@mui/material/colors';
-import { useAnimate, press, hover, useMotionValue } from "motion/react";
+import { purple } from '@mui/material/colors';
+import { useAnimate, press, hover, useMotionValue, frame, useSpring, motion } from "motion/react";
 import 'assets/home/css/home.css';
 import randomNumber from "utils/randomNumber";
+import { delay } from "motion";
 
 const Square = () => {
     const size = randomNumber({ min: 0, max: 10 });
@@ -45,6 +46,74 @@ const Square = () => {
     />
 };
 
+const CursorEffect = () => {
+    // const spring = { 
+        // damping: 20, 
+        // stiffness: 200, 
+        // restDelta: 0.001
+        // velocity: 100
+    // };
+    const numberOfBalls = 5;
+    const xPoint1 = useMotionValue(0);
+    const yPoint1 = useMotionValue(0);
+    // const x = useSpring(xPoint, spring);
+    // const y = useSpring(yPoint, spring);
+    // const [scope, animate] = useAnimate();
+    
+    
+    
+    
+    const Ball = ({ballNumber}:{ballNumber:number})=>{
+        const ref = useRef<HTMLDivElement>(null);
+        const xPoint = useMotionValue(0);
+        const yPoint = useMotionValue(0);
+        useEffect(()=>{
+            if (!ref.current) return;
+            const handlePointerMove = ({clientX, clientY}: MouseEvent)=>{
+                const element = ref.current!
+                frame.read(()=>{
+                    const x = clientX-element.offsetLeft-element.offsetWidth/2
+                    const y = clientY-element.offsetTop-element.offsetHeight/2;
+                    setTimeout(
+                        ()=>{
+                            xPoint.set(x);
+                            yPoint.set(y);
+                        },
+                        (ballNumber-1)*35
+                    );
+                });
+            };
+            window.addEventListener("pointermove", handlePointerMove);
+        },[]);
+        return <motion.div
+            ref={ref}
+            style={{
+                backgroundColor: purple[500],
+                borderRadius: '50%',
+                position: 'fixed',
+                width: `${50-(ballNumber*2)}px`,
+                height: `${50-(ballNumber*2)}px`,
+                x: xPoint,
+                y: yPoint,
+                opacity: 0.6-(0.1*ballNumber),
+            }}
+        />;
+    };
+
+    const Balls = ()=>{
+        let balls = [];
+        for(let i = 0; i <= numberOfBalls; i++) {
+            balls.push(<Ball ballNumber={i}/>);
+        }
+        return <>{balls}</>;
+    };
+
+    return <>
+        <Balls/>
+    </>
+    ;
+};
+
 // type ScarePosition = {
 //     x: number;
 //     y: number;
@@ -71,7 +140,7 @@ const AnimatedBackground = ()=> {
 
     return <Box 
         sx={{
-            // bgColor: blueGrey[900],//'primary.dark',
+            // bgColor: purple[900],//'primary.dark',
             // color: 'text.secondary',
             height: "100vh",
             // position: "absolute",
@@ -81,6 +150,7 @@ const AnimatedBackground = ()=> {
         onClick={clickFunction}
     >
         <Scares/>
+        <CursorEffect/>
         {/* {addedScares.map((i,k)=><Square key={k}/>)} */}
     </Box>
 }
